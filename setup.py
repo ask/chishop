@@ -28,6 +28,7 @@ setup(
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
         "License :: OSI Approved :: BSD License",
+        "Topic :: System :: Software Distribution",
         "Programming Language :: Python",
     ],
     long_description=codecs.open('README', "r", "utf-8").read(),
