@@ -3,4 +3,4 @@ include README
 include TODO
 include MANIFEST.in
 recursive-include djangopypi *
-recursive-include manifest *
+recursive-include chishop *
