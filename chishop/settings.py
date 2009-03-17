@@ -1,37 +1,18 @@
 # Django settings for djangopypi project.
 import os
 
-# ####
-# This are the settings you're most likely to change
-# when running the chishop servber.
-
-# If this is true errors will have informative error pages.
-DEBUG = True
-
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
-# Absolute path to the directory that holds media.
-# Example: "/home/media/media.lawrence.com/"
-# Uploaded python distributions will be saved in the
-# dists/ directory under this path.
-here = os.path.abspath(os.path.dirname(__file__))
-MEDIA_ROOT = os.path.join(here, 'media')
+MANAGERS = ADMINS
 
-
-# Database settings.
-
-DATABASE_ENGINE = 'sqlite3'         # or mysql
-DATABASE_NAME = 'devdatabase.db' 
+DATABASE_ENGINE = ''
+DATABASE_NAME = ''
 DATABASE_USER = ''
 DATABASE_PASSWORD = ''
 DATABASE_HOST = ''
 DATABASE_PORT = ''
-
-
-# ###### --- settings below here, are probably not that important ---- #####
-
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -44,15 +25,16 @@ TIME_ZONE = 'America/Chicago'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-MANAGERS = ADMINS
-TEMPLATE_DEBUG = DEBUG
-LOCAL_DEVELOPMENT = DEBUG
 SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
 
+# Absolute path to the directory that holds media.
+# Example: "/home/media/media.lawrence.com/"
+here = os.path.abspath(os.path.dirname(__file__))
+MEDIA_ROOT = os.path.join(here, 'media')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
