@@ -1,14 +1,18 @@
 # Django settings for djangopypi project.
 import os
 
+DEBUG=True
+TEMPLATE_DEBUG=True
+LOCAL_DEVELOPMENT=True
+
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = ''
-DATABASE_NAME = ''
+DATABASE_ENGINE = 'sqlite3'
+DATABASE_NAME = 'devdatabase.db'
 DATABASE_USER = ''
 DATABASE_PASSWORD = ''
 DATABASE_HOST = ''
