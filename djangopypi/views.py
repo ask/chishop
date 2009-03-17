@@ -30,7 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 """
 
-from django.http import HttpResponse, HttpResponseBadRequest, QueryDict
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.http import QueryDict
 from django.shortcuts import render_to_response
 from djangopypi.models import Project
 from djangopypi.forms import ProjectRegisterForm
@@ -92,8 +93,11 @@ def simple(request, template_name="djangopypi/simple.html"):
 
 def show_links(request, dist_name,
         template_name="djangopypi/show_links.html"):
-    releases = Project.objects.get(name=dist_name) \
-                    .releases.all().order_by('-version')
+    try:
+        releases = Project.objects.get(name=dist_name) \
+                        .releases.all().order_by('-version')
+    except Project.DoesNotExist:
+        raise Http404
 
     context = RequestContext(request, {
         "dist_name": dist_name,
@@ -105,8 +109,11 @@ def show_links(request, dist_name,
 
 def show_version(request, dist_name, version,
         template_name="djangopypi/show_version.html"):
-    release = Project.objects.get(name=dist_name).releases \
-                                    .get(version=version)
+    try:
+        release = Project.objects.get(name=dist_name).releases \
+                                        .get(version=version)
+    except Project.DoesNotExist:
+        raise Http404()
 
     context = RequestContext(request, {
         "dist_name": dist_name,
