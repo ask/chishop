@@ -4,11 +4,8 @@ from django.shortcuts import render_to_response
 from djangopypi.models import Project
 from djangopypi.forms import ProjectRegisterForm
 from django.template import RequestContext
-from yadayada.utils import template_path_builder
 from django.utils.datastructures import MultiValueDict
 from django.core.files.uploadedfile import SimpleUploadedFile
-
-T = template_path_builder("djangopypi")
 
 
 def parse_weird_post_data(data):
@@ -42,7 +39,7 @@ def parse_weird_post_data(data):
     return MultiValueDict(post_data), files
 
 
-def simple(request, template_name=T("simple")):
+def simple(request, template_name="djangopypi/simple.html"):
     if request.method == "POST":
         post_data, files = parse_weird_post_data(request.raw_post_data)
         action = post_data.get(":action")
@@ -61,7 +58,9 @@ def simple(request, template_name=T("simple")):
 
     return render_to_response(template_name, context_instance=context)
 
-def show_links(request, dist_name, template_name=T("show_links")):
+
+def show_links(request, dist_name,
+        template_name="djangopypi/show_links.html"):
     releases = Project.objects.get(name=dist_name) \
                     .releases.all().order_by('-version')
 
@@ -72,7 +71,9 @@ def show_links(request, dist_name, template_name=T("show_links")):
 
     return render_to_response(template_name, context_instance=context)
 
-def show_version(request, dist_name, version, template_name=T("show_version")):
+
+def show_version(request, dist_name, version,
+        template_name="djangopypi/show_version.html"):
     release = Project.objects.get(name=dist_name).releases \
                                     .get(version=version)
 
