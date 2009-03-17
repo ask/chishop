@@ -74,7 +74,7 @@ def parse_weird_post_data(data):
 
 def login_basic_auth(request):
     authentication = request.META.get("HTTP_AUTHORIZATION")
-    if not auth:
+    if not authentication:
         return
     (authmeth, auth) = authentication.split(' ', 1)
     if authmeth.lower() != "basic":
