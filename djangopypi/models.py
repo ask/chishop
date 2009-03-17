@@ -32,6 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import os
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
 OS_NAMES = (
@@ -85,6 +86,7 @@ class Project(models.Model):
     description = models.TextField(blank=True)
     author_email = models.CharField(max_length=255, blank=True)
     classifiers = models.ManyToManyField(Classifier)
+    owner = models.ForeignKey(User, related_name="projects")
 
     class Meta:
         verbose_name = _(u"project")
@@ -108,7 +110,8 @@ class Release(models.Model):
         verbose_name_plural = _(u"releases")
 
     def __unicode__(self):
-        return self.version
+        return u"%s %s (%s)" % (
+                self.project.name, self.version, self.distribution.name)
 
     @property
     def filename(self):

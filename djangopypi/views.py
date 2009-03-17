@@ -31,8 +31,9 @@ POSSIBILITY OF SUCH DAMAGE.
 """
 
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponseForbidden
 from django.shortcuts import render_to_response
+from django.contrib.auth import authenticate, login
 from djangopypi.models import Project
 from djangopypi.forms import ProjectRegisterForm
 from django.template import RequestContext
@@ -73,14 +74,19 @@ def parse_weird_post_data(data):
 
 def simple(request, template_name="djangopypi/simple.html"):
     if request.method == "POST":
+        if not request.user.is_authenticated():
+            return HttpResponseForbidden(
+                    "Not logged in, or invalid user/password")
         post_data, files = parse_weird_post_data(request.raw_post_data)
         action = post_data.get(":action")
         classifiers = post_data.getlist("classifiers")
         register_form = ProjectRegisterForm(post_data.copy())
         if register_form.is_valid():
-            return HttpResponse(register_form.save(classifiers,
-                file=files.get("content")))
-            return HttpResponse("Successfully registered.")
+            registered = register_form.save(classifiers, request.user,
+                                            file=files.get("content"))
+            if registered:
+                return HttpResponse("Successfully registered.")
+            return HttpResponseForbidden("That's not your project!")
         return HttpResponse("ERRORS: %s" % register_form.errors)
 
     dists = Project.objects.all()
