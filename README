@@ -1,0 +1,30 @@
+=========================================
+ChiShop/DjangoPyPI
+=========================================
+:Version: 0.1
+:Authors:
+    Ask Solem (askh@opera.com)
+
+Installation
+============
+
+First you have to install the dependencies::
+
+    $ python setup.py build
+    # python setup.py install # (run as root)
+
+Initial configuration
+---------------------
+
+    $ python manage.py syncdb
+
+Run the PyPI server
+-------------------
+
+    $ python manage.py runserver
+
+Contact Information
+====================
+askh@opera.com
+
+.. # vim: syntax=rst expandtab tabstop=4 shiftwidth=4 shiftround

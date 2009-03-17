@@ -1,0 +1,5 @@
+include AUTHORS
+include README
+include TODO
+include MANIFEST.in
+recursive-include manifest *

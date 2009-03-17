@@ -1,0 +1,12 @@
+.DS_Store
+*.pyc
+*~
+*.sqlite
+*.sqlite-journal
+settings_local.py
+.*.sw[po]
+dist/
+*.egg-info
+doc/__build/*
+pip-log.txt
+devdatabase.db
