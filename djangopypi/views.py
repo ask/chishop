@@ -72,8 +72,24 @@ def parse_weird_post_data(data):
     return MultiValueDict(post_data), files
 
 
+def login_basic_auth(request):
+    authentication = request.META.get("HTTP_AUTHORIZATION")
+    if not auth:
+        return
+    (authmeth, auth) = authentication.split(' ', 1)
+    if authmeth.lower() != "basic":
+        return
+    auth = auth.strip().decode("base64")
+    username, password = auth.split(":", 1)
+    return authenticate(username=username, password=password)
+
+
 def simple(request, template_name="djangopypi/simple.html"):
     if request.method == "POST":
+        user = login_basic_auth(request)
+        if not user:
+            return HttpResponseForbidden("Must give credentials.")
+        login(request, user)
         if not request.user.is_authenticated():
             return HttpResponseForbidden(
                     "Not logged in, or invalid user/password")
