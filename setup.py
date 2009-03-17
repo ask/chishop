@@ -12,11 +12,11 @@ except ImportError:
 
 setup(
     name='chishop',
-    version=__import__('chishop').__version__,
+    version=__import__('djangopypi').__version__,
     description='Simple PyPI server written in Django.',
     author='Ask Solem',
     author_email='askh@opera.com',
-    packages=[],
+    packages=["djangopypi"],
     install_requires=[
         'django>=1.0',
     ],
