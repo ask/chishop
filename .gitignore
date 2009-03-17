@@ -10,3 +10,8 @@ dist/
 doc/__build/*
 pip-log.txt
 devdatabase.db
+parts
+eggs
+bin
+developer-eggs
+downloads
