@@ -105,7 +105,6 @@ class Release(models.Model):
     project = models.ForeignKey(Project, related_name="releases")
 
     class Meta:
-        unique_together = ('version', 'platform')
         verbose_name = _(u"release")
         verbose_name_plural = _(u"releases")
 
