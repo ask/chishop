@@ -30,6 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 """
 
+import os
 from django import forms
 from djangopypi.models import Project, Classifier, Release
 
@@ -56,8 +57,23 @@ class ProjectRegisterForm(forms.Form):
         for classifier in classifiers:
             project.classifiers.add(
                     Classifier.objects.get_or_create(name=classifier)[0])
-        release, c = Release.objects.get_or_create(version=version,
-                platform=platform, project=project)
+
+        # If the old file already exists, django will append a _ after the
+        # filename, however with .tar.gz files django does the "wrong" thing
+        # and saves it as project-0.1.2.tar_.gz. So remove it before
+        # django sees anything.
+        try:
+            previous_entry = Release.objects.get(version=version,
+                    platform=platform, project=project)
+        except Release.DoesNotExist:
+            pass
+
+        release, created = Release.objects.get_or_create(version=version,
+                                                         platform=platform,
+                                                         project=project)
         if file:
+            if not created:
+                if os.path.exists(release.distribution.path):
+                    os.remove(release.distribution.path)
             release.distribution.save(file.name, file, save=True)
             release.save()
