@@ -47,12 +47,11 @@ class ProjectRegisterForm(forms.Form):
     version = forms.CharField()
     platform = forms.CharField(required=False)
 
-    def save(self, classifiers, user, file=None):
+    def save(self, classifiers, file=None):
         values = dict(self.cleaned_data)
         name = values.pop("name")
         version = values.pop("version")
         platform = values.pop("platform")
-        values["owner"] = user
         project, c = Project.objects.get_or_create(name=name, defaults=values)
         for classifier in classifiers:
             project.classifiers.add(
