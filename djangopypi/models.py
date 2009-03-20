@@ -108,7 +108,7 @@ class Release(models.Model):
         verbose_name_plural = _(u"releases")
 
     def __unicode__(self):
-        return self.version
+        return u"%s %s (%s)" (self.project.name, self.version, self.platform)
 
     @property
     def filename(self):
