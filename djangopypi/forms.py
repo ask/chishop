@@ -62,18 +62,19 @@ class ProjectRegisterForm(forms.Form):
         # filename, however with .tar.gz files django does the "wrong" thing
         # and saves it as project-0.1.2.tar_.gz. So remove it before
         # django sees anything.
-        try:
-            previous_entry = Release.objects.get(version=version,
-                    platform=platform, project=project)
-        except Release.DoesNotExist:
-            pass
+        if file:
+            try:
+                previous_entry = Release.objects.get(version=version,
+                        platform=platform, project=project)
+                if os.path.exists(previous_entry.distribution.path):
+                    os.remove(previous_entry.distribution.path)
+            except Release.DoesNotExist:
+                pass
+
 
         release, created = Release.objects.get_or_create(version=version,
                                                          platform=platform,
                                                          project=project)
         if file:
-            if not created:
-                if os.path.exists(release.distribution.path):
-                    os.remove(release.distribution.path)
             release.distribution.save(file.name, file, save=True)
             release.save()
