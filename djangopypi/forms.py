@@ -68,6 +68,7 @@ class ProjectRegisterForm(forms.Form):
                         platform=platform, project=project)
                 if os.path.exists(previous_entry.distribution.path):
                     os.remove(previous_entry.distribution.path)
+                previous_entry.delete()
             except Release.DoesNotExist:
                 pass
 
