@@ -6,11 +6,11 @@ urlpatterns = patterns("",
     url(r'^/?$', "djangopypi.views.simple",
         name="djangopypi-simple"),
 
-    url(r'^(?P<dist_name>[\w\d_\-]+)/(?P<version>[\w\.\d\-_]+)/?',
+    url(r'^(?P<dist_name>[\w\d_\.\-]+)/(?P<version>[\w\.\d\-_]+)/?',
         "djangopypi.views.show_version",
         name="djangopypi-show_version"),
 
-    url(r'^(?P<dist_name>[\w\d_\-]+)/?', "djangopypi.views.show_links",
+    url(r'^(?P<dist_name>[\w\d_\.\-]+)/?', "djangopypi.views.show_links",
         name="djangopypi-show_links"),
 )
 
