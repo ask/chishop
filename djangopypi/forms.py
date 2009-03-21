@@ -35,6 +35,10 @@ from django import forms
 from djangopypi.models import Project, Classifier, Release
 
 
+class PermissionDeniedError(Exception):
+    """The user did not have the priveliges to execute an action."""
+
+
 class ProjectRegisterForm(forms.Form):
     name = forms.CharField()
     license = forms.CharField(required=False)
@@ -48,12 +52,30 @@ class ProjectRegisterForm(forms.Form):
     version = forms.CharField()
     platform = forms.CharField(required=False)
 
-    def save(self, classifiers, file=None):
+    PermissionDeniedError = PermissionDeniedError
+
+    def save(self, classifiers, user, file=None):
         values = dict(self.cleaned_data)
-        name = values.pop("name")
+        name = values["name"]
         version = values.pop("version")
-        platform = values.pop("platform")
-        project, c = Project.objects.get_or_create(name=name, defaults=values)
+        platform = values.pop("platform", "UNKNOWN")
+        values["owner"] = user
+
+        try:
+            project = Project.objects.get(name=name)
+        except Project.DoesNotExist:
+            project = Project.objects.create(**values)
+        else:
+            # If the project already exists,
+            # be sure that the current user owns this object.
+            if project.owner != user:
+                raise self.PermissionDeniedError(
+                        "%s doesn't own that project." % user.username)
+            [setattr(project, field_name, field_value)
+                for field_name, field_value in values.items()]
+        project.save()
+
+
         for classifier in classifiers:
             project.classifiers.add(
                     Classifier.objects.get_or_create(name=classifier)[0])
@@ -62,16 +84,16 @@ class ProjectRegisterForm(forms.Form):
         # filename, however with .tar.gz files django does the "wrong" thing
         # and saves it as project-0.1.2.tar_.gz. So remove it before
         # django sees anything.
+        
         if file:
             try:
-                previous_entry = Release.objects.get(version=version,
+                release = Release.objects.get(version=version,
                         platform=platform, project=project)
-                if os.path.exists(previous_entry.distribution.path):
-                    os.remove(previous_entry.distribution.path)
-                previous_entry.delete()
-            except Release.DoesNotExist:
+                if os.path.exists(release.distribution.path):
+                    os.remove(release.distribution.path)
+                release.delete()
+            except (Release.DoesNotExist, ValueError):
                 pass
-
 
         release, created = Release.objects.get_or_create(version=version,
                                                          platform=platform,

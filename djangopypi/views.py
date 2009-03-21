@@ -31,13 +31,14 @@ POSSIBILITY OF SUCH DAMAGE.
 """
 
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponseForbidden
 from django.shortcuts import render_to_response
 from djangopypi.models import Project
 from djangopypi.forms import ProjectRegisterForm
 from django.template import RequestContext
 from django.utils.datastructures import MultiValueDict
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.contrib.auth import authenticate, login
 
 
 def parse_weird_post_data(data):
@@ -71,15 +72,46 @@ def parse_weird_post_data(data):
     return MultiValueDict(post_data), files
 
 
+def login_basic_auth(request):
+    authentication = request.META.get("HTTP_AUTHORIZATION")
+    if not authentication:
+        return
+    (authmeth, auth) = authentication.split(' ', 1)
+    if authmeth.lower() != "basic":
+        return
+    auth = auth.strip().decode("base64")
+    username, password = auth.split(":", 1)
+    return authenticate(username=username, password=password)
+
+
+def authorization_required_response():
+    response = HttpResponse("Authorization required",
+            mimetype="text/plain")
+    response['WWW-Authenticate'] = 'Basic realm="pypi"'
+    response.status_code = 401
+    return response
+
+
 def simple(request, template_name="djangopypi/simple.html"):
     if request.method == "POST":
+        user = login_basic_auth(request)
+        if not user:
+            return authorization_required_response()
+        login(request, user)
+        if not request.user.is_authenticated():
+            return HttpResponseForbidden(
+                    "Not logged in, or invalid username/password.")
         post_data, files = parse_weird_post_data(request.raw_post_data)
         action = post_data.get(":action")
         classifiers = post_data.getlist("classifiers")
         register_form = ProjectRegisterForm(post_data.copy())
         if register_form.is_valid():
-            return HttpResponse(register_form.save(classifiers,
-                file=files.get("content")))
+            try:
+                register_form.save(classifiers, request.user,
+                        file=files.get("content"))
+            except register_form.PermissionDeniedError:
+                return HttpResonseForbidden(
+                        "That project is owned by someone else!")
             return HttpResponse("Successfully registered.")
         return HttpResponse("ERRORS: %s" % register_form.errors)
 

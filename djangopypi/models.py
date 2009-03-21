@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 import os
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import User
 
 OS_NAMES = (
         ("aix", "AIX"),
@@ -85,6 +86,7 @@ class Project(models.Model):
     description = models.TextField(blank=True)
     author_email = models.CharField(max_length=255, blank=True)
     classifiers = models.ManyToManyField(Classifier)
+    owner = models.ForeignKey(User, related_name="projects")
 
     class Meta:
         verbose_name = _(u"project")
