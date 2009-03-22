@@ -1,3 +1,2 @@
-* Add authentication for register/upload, + register new user.
 * Maybe add a permission "can upload new release", so more than one
 user can change the same project.
