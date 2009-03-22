@@ -1,2 +1,4 @@
+* Add a pretty, user-friendly web site interface in addition to
+  the API interface.
 * Maybe add a permission "can upload new release", so more than one
 user can change the same project.
