@@ -115,7 +115,7 @@ def simple(request, template_name="djangopypi/simple.html"):
             return HttpResponse("Successfully registered.")
         return HttpResponse("ERRORS: %s" % register_form.errors)
 
-    dists = Project.objects.all()
+    dists = Project.objects.all().order_by("name")
     context = RequestContext(request, {
         "dists": dists,
     })
