@@ -95,6 +95,10 @@ class Project(models.Model):
     def __unicode__(self):
         return self.name
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('djangopypi-show_links', (), {'dist_name': self.name})
+
 
 class Release(models.Model):
     version = models.CharField(max_length=128)
@@ -119,3 +123,12 @@ class Release(models.Model):
     @property
     def path(self):
         return self.distribution.name
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('djangopypi-show_version', (), {'dist_name': self.project, 'version': self.version})
+
+    def get_dl_url(self):
+        return "%s#md5=%s" % (self.distribution.url, self.dist_md5sum)
+
+

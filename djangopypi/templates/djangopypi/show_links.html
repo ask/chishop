@@ -2,7 +2,6 @@
 <h1>Links for {{ dist_name }}</h1>
 
 {% for release in releases %}
-<a href="/media/{{ release.path }}#md5={{ release.dist_md5sum }}"
->{{ release.filename }}</a><br />
+<a href="{{ release.get_dl_url }}">{{ release.filename }}</a><br />
 {% endfor %}
 </body></html>

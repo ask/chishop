@@ -1,5 +1,5 @@
 <html><head><title>Simple Index</title></head></body>
 {% for dist in dists %}
-<a href="{{ dist.name }}"/>{{ dist.name }}</a><br />
+<a href="{{ dist.get_absolute_url }}"/>{{ dist.name }}</a><br />
 {% endfor %}
 </body></html>
