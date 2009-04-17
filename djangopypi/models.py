@@ -110,11 +110,15 @@ class Release(models.Model):
         verbose_name_plural = _(u"releases")
 
     def __unicode__(self):
-        return u"%s %s (%s)" % (self.project.name, self.version, self.platform)
+        return u"%s (%s)" % (self.release_name, self.platform)
 
     @property
     def filename(self):
         return os.path.basename(self.distribution.name)
+
+    @property
+    def release_name(self):
+        return u"%s-%s" % (self.project.name, self.version)
 
     @property
     def path(self):
