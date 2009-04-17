@@ -91,7 +91,6 @@ class ProjectRegisterForm(forms.Form):
         # filename, however with .tar.gz files django does the "wrong" thing
         # and saves it as project-0.1.2.tar_.gz. So remove it before
         # django sees anything.
-
         allow_overwrite = getattr(settings,
                 "DJANGOPYPI_ALLOW_VERSION_OVERWRITE", False)
         
