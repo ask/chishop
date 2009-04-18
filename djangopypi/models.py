@@ -87,6 +87,7 @@ class Project(models.Model):
     author_email = models.CharField(max_length=255, blank=True)
     classifiers = models.ManyToManyField(Classifier)
     owner = models.ForeignKey(User, related_name="projects")
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _(u"project")
@@ -103,10 +104,13 @@ class Project(models.Model):
 class Release(models.Model):
     version = models.CharField(max_length=128)
     distribution = models.FileField(upload_to="dists")
-    dist_md5sum = models.CharField(max_length=255, blank=True)
+    md5_digest = models.CharField(max_length=255, blank=True)
     platform = models.CharField(max_length=255, blank=True)
     signature = models.CharField(max_length=128, blank=True)
+    filetype = models.CharField(max_length=255, blank=True)
+    pyversion = models.CharField(max_length=255, blank=True)
     project = models.ForeignKey(Project, related_name="releases")
+    upload_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('version', 'platform')
@@ -115,6 +119,17 @@ class Release(models.Model):
 
     def __unicode__(self):
         return u"%s (%s)" % (self.release_name, self.platform)
+
+    @property
+    def type(self):
+        dist_file_types = {
+            'sdist':'Source',
+            'bdist_dumb':'"dumb" binary',
+            'bdist_rpm':'RPM',
+            'bdist_wininst':'MS Windows installer',
+            'bdist_egg':'Python Egg',
+            'bdist_dmg':'OS X Disk Image'}
+        return dist_file_types.get(self.filetype, self.filetype)
 
     @property
     def filename(self):
@@ -133,6 +148,6 @@ class Release(models.Model):
         return ('djangopypi-show_version', (), {'dist_name': self.project, 'version': self.version})
 
     def get_dl_url(self):
-        return "%s#md5=%s" % (self.distribution.url, self.dist_md5sum)
+        return "%s#md5=%s" % (self.distribution.url, self.md5_digest)
 
 
