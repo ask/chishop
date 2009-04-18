@@ -40,6 +40,7 @@ from django.utils.datastructures import MultiValueDict
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import authenticate, login
 
+from http import HttpResponseNotImplemented, HttpResponseUnauthorized
 
 def parse_weird_post_data(data):
     sep = data.splitlines()[1]
@@ -84,19 +85,11 @@ def login_basic_auth(request):
     return authenticate(username=username, password=password)
 
 
-def authorization_required_response():
-    response = HttpResponse("Authorization required",
-            mimetype="text/plain")
-    response['WWW-Authenticate'] = 'Basic realm="pypi"'
-    response.status_code = 401
-    return response
-
-
 def simple(request, template_name="djangopypi/simple.html"):
     if request.method == "POST":
         user = login_basic_auth(request)
         if not user:
-            return authorization_required_response()
+            return  HttpResponseUnauthorized('PyPI')
         login(request, user)
         if not request.user.is_authenticated():
             return HttpResponseForbidden(
