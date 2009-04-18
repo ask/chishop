@@ -33,11 +33,17 @@ POSSIBILITY OF SUCH DAMAGE.
 import os
 from django import forms
 from djangopypi.models import Project, Classifier, Release
+from django.utils.translation import ugettext_lazy as _
 
 
 class PermissionDeniedError(Exception):
-    """The user did not have the priveliges to execute an action."""
+    """The user did not have the privileges to execute an action."""
 
+class AlreadyExistsError(Exception):
+    """Filename already exists."""
+
+ALREADY_EXISTS_FMT = _("""A file named "%s" already exists for %s. To fix """
+                     + "problems with that you should create a new release.")
 
 class ProjectRegisterForm(forms.Form):
     name = forms.CharField()
@@ -53,6 +59,7 @@ class ProjectRegisterForm(forms.Form):
     platform = forms.CharField(required=False)
 
     PermissionDeniedError = PermissionDeniedError
+    AlreadyExistsError = AlreadyExistsError
 
     def save(self, classifiers, user, file=None):
         values = dict(self.cleaned_data)
@@ -84,13 +91,19 @@ class ProjectRegisterForm(forms.Form):
         # filename, however with .tar.gz files django does the "wrong" thing
         # and saves it as project-0.1.2.tar_.gz. So remove it before
         # django sees anything.
+        allow_overwrite = getattr(settings,
+                "DJANGOPYPI_ALLOW_VERSION_OVERWRITE", False)
         
         if file:
             try:
                 release = Release.objects.get(version=version,
                         platform=platform, project=project)
                 if os.path.exists(release.distribution.path):
+                    if not allow_overwrite:
+                        raise self.AlreadyExistsError(ALREADY_EXISTS_FMT % (
+                            release.filename, release))
                     os.remove(release.distribution.path)
+
                 release.delete()
             except (Release.DoesNotExist, ValueError):
                 pass

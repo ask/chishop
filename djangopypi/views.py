@@ -109,9 +109,11 @@ def simple(request, template_name="djangopypi/simple.html"):
             try:
                 register_form.save(classifiers, request.user,
                         file=files.get("content"))
-            except register_form.PermissionDeniedError:
+            except register_form.PermissionDeniedError, e:
                 return HttpResonseForbidden(
                         "That project is owned by someone else!")
+            except register_form.AlreadyExistsError, e:
+                return HttpResponseForbidden(e)
             return HttpResponse("Successfully registered.")
         return HttpResponse("ERRORS: %s" % register_form.errors)
 
