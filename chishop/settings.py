@@ -9,6 +9,13 @@ ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
+# Allow uploading a new distribution file for a project version
+# if a file of that type already exists.
+#
+# The default on PyPI is to not allow this, but it can be real handy
+# if you're sloppy.
+DJANGOPYPI_ALLOW_VERSION_OVERWRITE = False
+
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'sqlite3'
