@@ -68,7 +68,10 @@ def parse_weird_post_data(data):
         elif headers["name"] in post_data:
             post_data[headers["name"]].append(content)
         else:
-            post_data[headers["name"]] = [content]
+            if content == 'UNKNOWN':
+                post_data[headers["name"]] = [None]
+            else:
+                post_data[headers["name"]] = [content]
 
     return MultiValueDict(post_data), files
 
