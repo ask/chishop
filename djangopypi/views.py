@@ -39,8 +39,9 @@ from django.template import RequestContext
 from django.utils.datastructures import MultiValueDict
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import authenticate, login
+from djangopypi.http import HttpResponseNotImplemented
+from djangopypi.http import HttpResponseUnauthorized
 
-from http import HttpResponseNotImplemented, HttpResponseUnauthorized
 
 def parse_weird_post_data(data):
     sep = data.splitlines()[1]
@@ -68,6 +69,7 @@ def parse_weird_post_data(data):
         elif headers["name"] in post_data:
             post_data[headers["name"]].append(content)
         else:
+            # Distutils sends UNKNOWN for empty fields (e.g platform)
             if content == 'UNKNOWN':
                 post_data[headers["name"]] = [None]
             else:
@@ -92,7 +94,7 @@ def simple(request, template_name="djangopypi/simple.html"):
     if request.method == "POST":
         user = login_basic_auth(request)
         if not user:
-            return  HttpResponseUnauthorized('PyPI')
+            return HttpResponseUnauthorized('PyPI')
         login(request, user)
         if not request.user.is_authenticated():
             return HttpResponseForbidden(
