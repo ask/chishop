@@ -14,7 +14,7 @@ modification, are permitted provided that the following conditions are met:
 
 Neither the name of Ask Solem nor the names of its contributors may be used
 to endorse or promote products derived from this software without specific
-prior written permission. 
+prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -116,6 +116,7 @@ def simple(request, template_name="djangopypi/simple.html"):
     dists = Project.objects.all().order_by("name")
     context = RequestContext(request, {
         "dists": dists,
+        "title": 'Package Index',
     })
 
     return render_to_response(template_name, context_instance=context)
@@ -124,14 +125,16 @@ def simple(request, template_name="djangopypi/simple.html"):
 def show_links(request, dist_name,
         template_name="djangopypi/show_links.html"):
     try:
-        releases = Project.objects.get(name=dist_name) \
-                        .releases.all().order_by('-version')
+        project = Project.objects.get(name=dist_name)
+        releases = project.releases.all().order_by('-version')
     except Project.DoesNotExist:
         raise Http404
 
     context = RequestContext(request, {
         "dist_name": dist_name,
         "releases": releases,
+        "project": project,
+        "title": project.name,
     })
 
     return render_to_response(template_name, context_instance=context)
@@ -149,6 +152,7 @@ def show_version(request, dist_name, version,
         "dist_name": dist_name,
         "version": version,
         "release": release,
+        "title": dist_name,
     })
 
     return render_to_response(template_name, context_instance=context)
