@@ -1,0 +1,16 @@
+{% extends "base_site.html" %}
+
+{% block bread_crumbs_1 %}{% endblock %}
+
+{% block content %}
+<table><thead><th>Updated</th><th>Package</th><th>Summary</th></thead>
+<tbody>
+{% for dist in dists %}
+    <tr>
+        <td>{{ dist.updated|date:"d/m/y" }}
+        <td><a href="{{ dist.get_pypi_absolute_url }}"/>{{ dist.name }}</a></td>
+        <td>{{ dist.summary|truncatewords:10 }}</td>
+    </tr>
+{% endfor %}
+</tbody></table>
+{% endblock %}
