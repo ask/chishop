@@ -117,7 +117,6 @@ class Release(models.Model):
     upload_time = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('version', 'platform')
         verbose_name = _(u"release")
         verbose_name_plural = _(u"releases")
 
