@@ -32,6 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import os
 from django import forms
+from django.conf import settings
 from djangopypi.models import Project, Classifier, Release
 from django.utils.translation import ugettext_lazy as _
 
@@ -39,11 +40,13 @@ from django.utils.translation import ugettext_lazy as _
 class PermissionDeniedError(Exception):
     """The user did not have the privileges to execute an action."""
 
+
 class AlreadyExistsError(Exception):
     """Filename already exists."""
 
 ALREADY_EXISTS_FMT = _("""A file named "%s" already exists for %s. To fix """
                      + "problems with that you should create a new release.")
+
 
 class ProjectRegisterForm(forms.Form):
     name = forms.CharField()
