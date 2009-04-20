@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-au" xml:lang="en-au">
+<head>
+<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/base.css{% endblock %}"/>
+{% block extrastyle %}{% endblock %}
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<title>{% block title %}{% endblock %}</title>
+<meta name="author" content="{% block author %}{% endblock %}"/>
+{% block site_extrahead %}{% endblock %}
+{% block extrahead %}{% endblock %}
+</head>
+
+<body>
+<!-- Container -->
+<div id="container">
+
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+        {% block site_logo %}{% endblock %}
+        <h1 id="site-name">{% block site_name_header %}{% endblock %}</h1>
+        </div>
+    </div>
+    <!-- END Header -->
+
+    <div class="breadcrumbs">
+     {% block breadcrumbs %}<a href="/{{ base_url }}">Home</a>{% endblock %}
+     {% block bread_crumbs_1 %}{% endblock %}</div>
+        {% block messagelist %}
+        {% if messages %}
+        <ul class="messagelist">
+        {% for message in messages %}
+                <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+        {% endblock %}
+
+    <!-- Content -->
+    <div id="content" class="{% block coltype %}colM{% endblock %}">
+        {% block pretitle %}{% endblock %}
+        <h1>{% block content_title %}{% endblock %}</h1>
+        <div id="content-main">
+        {% block objecttools %}{% endblock %}
+        {% block sidebar %}{% endblock %}
+        {% block content %}{{ content }}{% endblock %}
+        </div>
+        <br class="clear" />
+    </div>
+    <!-- END Content -->
+
+    <!-- Header -->
+    <div id="footer">
+    {% block footer %}
+    {% endblock %}
+    </div>
+    <!-- END Content -->
+</div>
+<!-- END Container -->
+
+</body>
+</html>
+

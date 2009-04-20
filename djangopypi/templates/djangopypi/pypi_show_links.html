@@ -1,0 +1,39 @@
+{% extends "base_site.html" %}
+
+{% block content %}
+<p style="font-style: italic;">
+{{ project.summary }}
+</p>
+{% load markup %}
+{{ project.description|restructuredtext }}
+
+<br/>
+<table><thead><th>Filename</th><th>Platform</th><th>Type</th><th>Version</th><th>Uploaded On</th><th>Size</th></thead>
+<tbody>
+    {% for release in releases %}
+    <tr>
+        <td><a href="{{ release.get_dl_url }}">{{ release.filename }}</a></td>
+        <td>{{ release.platform }}</td>
+        <td>{{ release.type }}</td>
+        <td>{{ release.pyversion }}</td>
+        <td>{{ release.upload_time }}</td>
+        <td>{{ release.distribution.size|filesizeformat }}</td>
+    </tr>
+    {% endfor %}
+</tbody></table>
+<br/>
+<ul class="plainlist">
+<li><strong>License: </strong>{{ project.license }}</li>
+<li><strong>Author: </strong><a href="mailto:{{ project.author_email }}">{{ project.author }}</a></li>
+<li><strong>Home Page: </strong><a href="{{ project.home_page }}">{{ project.home_page }}</a></li>
+<li><strong>Download URL: </strong><a href="{{ project.download_url }}">{{ project.download_url }}</a></li>
+<li><strong>Classifiers: </strong>
+    <ul class="plainlist">
+    {% for class in project.classifiers.order_by %}
+        <li>{{ class }}</li>
+    {% endfor %}
+    </ul>
+</li>
+</ul>
+{% endblock %}
+

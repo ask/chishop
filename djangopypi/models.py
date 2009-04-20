@@ -100,6 +100,10 @@ class Project(models.Model):
     def get_absolute_url(self):
         return ('djangopypi-show_links', (), {'dist_name': self.name})
 
+    @models.permalink
+    def get_pypi_absolute_url(self):
+        return ('djangopypi-pypi_show_links', (), {'dist_name': self.name})
+
 
 class Release(models.Model):
     version = models.CharField(max_length=128)
