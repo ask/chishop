@@ -70,6 +70,7 @@ setup(
     data_files=data_files,
     install_requires=[
         'django>=1.0',
+        'docutils',
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
