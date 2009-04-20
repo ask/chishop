@@ -12,7 +12,7 @@
 <tbody>
     {% for release in releases %}
     <tr>
-        <td><a href="{{ release.get_dl_url }}">{{ release.filename }}</a></td>
+        <td><a href="/{{ release.get_dl_url }}">{{ release.filename }}</a></td>
         <td>{{ release.platform }}</td>
         <td>{{ release.type }}</td>
         <td>{{ release.pyversion }}</td>
