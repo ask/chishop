@@ -7,3 +7,7 @@
 * Maybe add a permission "can upload new release", so more than one
   user can change the same project.
 * Should a project have co-owners?
+    - One possible solution: 
+            http://github.com/initcrash/django-object-permissions/tree
+* Script to populate classifiers from 
+        http://pypi.python.org/pypi?%3Aaction=list_classifiers 
