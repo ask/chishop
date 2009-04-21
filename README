@@ -52,20 +52,27 @@ Add the following to your ``~/.pypirc`` file::
 
     username:user
     password:secret
-
     repository:http://localhost:8000
 
-Pushing a package to local PyPI
------------------------------------
+Uploading a package: Python >=2.6
+--------------------------------------------
+
+To push the package to the local pypi::
+
+    $ python setup.py register sdist upload -r local
+
+
+Uploading a package: Python <2.6
+-------------------------------------------
+
+If you don't have Python 2.6 please run the command below to install the backport of the extension::
+
+     $ easy_install -U collective.dist
 
 instead of using register and dist command, you can use "mregister" and "mupload", that are a backport of python 2.6 register and upload commands, that supports multiple servers.
 
 To push the package to the local pypi::
 
     $ python setup.py mregister sdist mupload -r local
-
-If you don't have Python 2.6 please run the command below to install the backport of the extension::
-
-     $ easy_install -U collective.dist
 
 .. # vim: syntax=rst expandtab tabstop=4 shiftwidth=4 shiftround
