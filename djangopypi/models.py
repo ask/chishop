@@ -77,7 +77,7 @@ class Classifier(models.Model):
 
 class Project(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    license = models.CharField(max_length=255, blank=True)
+    license = models.TextField(blank=True)
     metadata_version = models.CharField(max_length=64, default=1.0)
     author = models.CharField(max_length=128, blank=True)
     home_page = models.URLField(verify_exists=False, blank=True, null=True)
