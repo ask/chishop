@@ -31,6 +31,7 @@ POSSIBILITY OF SUCH DAMAGE.
 """
 
 import os
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
@@ -63,6 +64,8 @@ ARCHITECTURES = (
     ("ultrasparc", "UltraSparc"),
 )
 
+UPLOAD_TO = getattr(settings,
+    "DJANGOPYPI_RELEASE_UPLOAD_TO", 'dist')
 
 class Classifier(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -107,7 +110,7 @@ class Project(models.Model):
 
 class Release(models.Model):
     version = models.CharField(max_length=128)
-    distribution = models.FileField(upload_to="dists")
+    distribution = models.FileField(upload_to=UPLOAD_TO)
     md5_digest = models.CharField(max_length=255, blank=True)
     platform = models.CharField(max_length=255, blank=True)
     signature = models.CharField(max_length=128, blank=True)

@@ -15,6 +15,7 @@ ADMINS = (
 # The default on PyPI is to not allow this, but it can be real handy
 # if you're sloppy.
 DJANGOPYPI_ALLOW_VERSION_OVERWRITE = False
+DJANGOPYPI_RELEASE_UPLOAD_TO = 'dists'
 
 MANAGERS = ADMINS
 

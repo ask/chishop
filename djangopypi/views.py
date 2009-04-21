@@ -30,17 +30,25 @@ POSSIBILITY OF SUCH DAMAGE.
 
 """
 
+import os
+
+from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.http import QueryDict, HttpResponseForbidden
 from django.shortcuts import render_to_response
-from djangopypi.models import Project
-from djangopypi.forms import ProjectRegisterForm
+from djangopypi.models import Project, Classifier, Release, UPLOAD_TO
+from djangopypi.forms import ProjectForm, ReleaseForm
 from django.template import RequestContext
 from django.utils.datastructures import MultiValueDict
+from django.utils.translation import ugettext_lazy as _
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import authenticate, login
 from djangopypi.http import HttpResponseNotImplemented
 from djangopypi.http import HttpResponseUnauthorized
+
+
+ALREADY_EXISTS_FMT = _("""A file named "%s" already exists for %s. To fix """
+                     + "problems with that you should create a new release.")
 
 
 def parse_weird_post_data(raw_post_data):
@@ -74,7 +82,7 @@ def parse_weird_post_data(raw_post_data):
         if "filename" in headers:
             file = SimpleUploadedFile(headers["filename"], content,
                     content_type="application/gzip")
-            files[headers["name"]] = file
+            files["distribution"] = [file]
         elif headers["name"] in post_data:
             post_data[headers["name"]].append(content)
         else:
@@ -85,7 +93,7 @@ def parse_weird_post_data(raw_post_data):
             else:
                 post_data[headers["name"]] = [content]
 
-    return MultiValueDict(post_data), files
+    return MultiValueDict(post_data), MultiValueDict(files)
 
 
 def login_basic_auth(request):
@@ -100,30 +108,76 @@ def login_basic_auth(request):
     return authenticate(username=username, password=password)
 
 
+def submit_project_or_release(user, post_data, files):
+    """Registers/updates a project or release"""
+    try:
+        project = Project.objects.get(name=post_data['name'])
+        if project.owner != user:
+            return HttpResponseForbidden(
+                    "That project is owned by someone else!")
+    except Project.DoesNotExist:
+        project = None
+
+    project_form = ProjectForm(post_data, instance=project)
+    if project_form.is_valid():
+        project = project_form.save(commit=False)
+        project.owner = user
+        project.save()
+        for c in post_data.getlist('classifiers'):
+            classifier, created = Classifier.objects.get_or_create(name=c)
+            project.classifiers.add(classifier)
+        if files:
+            allow_overwrite = getattr(settings,
+                "DJANGOPYPI_ALLOW_VERSION_OVERWRITE", False)
+            try:
+                release = Release.objects.get(version=post_data['version'],
+                                              project=project,
+                                              distribution=UPLOAD_TO + '/' +
+                                              files['distribution']._name)
+                if not allow_overwrite:
+                    return HttpResponseForbidden(ALREADY_EXISTS_FMT % (
+                                release.filename, release))
+            except Release.DoesNotExist:
+                release = None
+
+            # If the old file already exists, django will append a _ after the
+            # filename, however with .tar.gz files django does the "wrong"
+            # thing and saves it as project-0.1.2.tar_.gz. So remove it before
+            # django sees anything.
+            release_form = ReleaseForm(post_data, files, instance=release)
+            if release_form.is_valid():
+                if release and os.path.exists(release.distribution.path):
+                    os.remove(release.distribution.path)
+                release = release_form.save(commit=False)
+                release.project = project
+                release.save()
+            else:
+                return HttpResponseBadRequest(
+                        "ERRORS: %s" % release_form.errors)
+    else:
+        return HttpResponseBadRequest("ERRORS: %s" % project_form.errors)
+
+    return HttpResponse()
+
+
 def simple(request, template_name="djangopypi/simple.html"):
     if request.method == "POST":
-        user = login_basic_auth(request)
-        if not user:
-            return HttpResponseUnauthorized('PyPI')
-        login(request, user)
-        if not request.user.is_authenticated():
-            return HttpResponseForbidden(
-                    "Not logged in, or invalid username/password.")
         post_data, files = parse_weird_post_data(request.raw_post_data)
         action = post_data.get(":action")
-        classifiers = post_data.getlist("classifiers")
-        register_form = ProjectRegisterForm(post_data.copy())
-        if register_form.is_valid():
-            try:
-                register_form.save(classifiers, request.user,
-                        file=files.get("content"))
-            except register_form.PermissionDeniedError, e:
-                return HttpResonseForbidden(
-                        "That project is owned by someone else!")
-            except register_form.AlreadyExistsError, e:
-                return HttpResponseForbidden(e)
-            return HttpResponse("Successfully registered.")
-        return HttpResponse("ERRORS: %s" % register_form.errors)
+        if action == 'file_upload':
+            user = login_basic_auth(request)
+            if not user:
+                return HttpResponseUnauthorized('PyPI')
+
+            login(request, user)
+            if not request.user.is_authenticated():
+                return HttpResponseForbidden(
+                        "Not logged in, or invalid username/password.")
+
+            return submit_project_or_release(user, post_data, files)
+
+        return HttpResponseNotImplemented(
+                "The :action %s is not implemented" % action)
 
     dists = Project.objects.all().order_by("name")
     context = RequestContext(request, {
