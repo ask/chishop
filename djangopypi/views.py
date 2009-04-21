@@ -46,7 +46,7 @@ from djangopypi.http import HttpResponseUnauthorized
 def parse_weird_post_data(raw_post_data):
     """ For some reason Django can't parse the HTTP POST data
     sent by ``distutils`` register/upload commands.
-    
+
     This parser should be able to so, and returns a
     :class:`django.utils.datastructures.MultiValueDict`
     as you would expect from a regular ``request.POST`` object.
@@ -57,9 +57,7 @@ def parse_weird_post_data(raw_post_data):
     items = raw_post_data.split(sep)
     post_data = {}
     files = {}
-    for part in items:
-        if not part.strip():
-            continue
+    for part in [e for e in items if not e.isspace()]:
         item = part.splitlines()
         if len(item) < 2: continue
         header = item[1].replace("Content-Disposition: form-data; ", "")
