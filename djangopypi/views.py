@@ -79,7 +79,7 @@ def parse_weird_post_data(raw_post_data):
             post_data[headers["name"]].append(content)
         else:
             # Distutils sends UNKNOWN for empty fields (e.g platform)
-            # [russel.sim@jcu.edu.au]
+            # [russell.sim@gmail.com]
             if content == 'UNKNOWN':
                 post_data[headers["name"]] = [None]
             else:
