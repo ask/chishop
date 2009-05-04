@@ -14,7 +14,7 @@ modification, are permitted provided that the following conditions are met:
 
 Neither the name of Ask Solem nor the names of its contributors may be used
 to endorse or promote products derived from this software without specific
-prior written permission. 
+prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -107,6 +107,12 @@ class Project(models.Model):
     def get_pypi_absolute_url(self):
         return ('djangopypi-pypi_show_links', (), {'dist_name': self.name})
 
+    def get_release(self, version):
+        """Return the release object for version, or None"""
+        try:
+            self.releases.get(version=version)
+        except Release.DoesNotExist:
+            return None
 
 class Release(models.Model):
     version = models.CharField(max_length=128)
@@ -155,5 +161,3 @@ class Release(models.Model):
 
     def get_dl_url(self):
         return "%s#md5=%s" % (self.distribution.url, self.md5_digest)
-
-
