@@ -37,83 +37,14 @@ from djangopypi.models import Project, Classifier, Release
 from django.utils.translation import ugettext_lazy as _
 
 
-class PermissionDeniedError(Exception):
-    """The user did not have the privileges to execute an action."""
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        exclude = ['owner', 'classifiers']
 
 
-class AlreadyExistsError(Exception):
-    """Filename already exists."""
+class ReleaseForm(forms.ModelForm):
+    class Meta:
+        model = Release
+        exclude = ['project']
 
-ALREADY_EXISTS_FMT = _("""A file named "%s" already exists for %s. To fix """
-                     + "problems with that you should create a new release.")
-
-
-class ProjectRegisterForm(forms.Form):
-    name = forms.CharField()
-    license = forms.CharField(required=False)
-    metadata_version = forms.CharField(initial="1.0")
-    author = forms.CharField(required=False)
-    home_page = forms.CharField(required=False)
-    download_url = forms.CharField(required=False)
-    summary = forms.CharField(required=False)
-    description = forms.CharField(required=False)
-    author_email = forms.CharField(required=False)
-    version = forms.CharField()
-    platform = forms.CharField(required=False)
-
-    PermissionDeniedError = PermissionDeniedError
-    AlreadyExistsError = AlreadyExistsError
-
-    def save(self, classifiers, user, file=None):
-        values = dict(self.cleaned_data)
-        name = values["name"]
-        version = values.pop("version")
-        platform = values.pop("platform", "UNKNOWN")
-        values["owner"] = user
-
-        try:
-            project = Project.objects.get(name=name)
-        except Project.DoesNotExist:
-            project = Project.objects.create(**values)
-        else:
-            # If the project already exists,
-            # be sure that the current user owns this object.
-            if project.owner != user:
-                raise self.PermissionDeniedError(
-                        "%s doesn't own that project." % user.username)
-            [setattr(project, field_name, field_value)
-                for field_name, field_value in values.items()]
-        project.save()
-
-
-        for classifier in classifiers:
-            project.classifiers.add(
-                    Classifier.objects.get_or_create(name=classifier)[0])
-
-        # If the old file already exists, django will append a _ after the
-        # filename, however with .tar.gz files django does the "wrong" thing
-        # and saves it as project-0.1.2.tar_.gz. So remove it before
-        # django sees anything.
-        allow_overwrite = getattr(settings,
-                "DJANGOPYPI_ALLOW_VERSION_OVERWRITE", False)
-        
-        if file:
-            try:
-                release = Release.objects.get(version=version,
-                        platform=platform, project=project)
-                if os.path.exists(release.distribution.path):
-                    if not allow_overwrite:
-                        raise self.AlreadyExistsError(ALREADY_EXISTS_FMT % (
-                            release.filename, release))
-                    os.remove(release.distribution.path)
-
-                release.delete()
-            except (Release.DoesNotExist, ValueError):
-                pass
-
-        release, created = Release.objects.get_or_create(version=version,
-                                                         platform=platform,
-                                                         project=project)
-        if file:
-            release.distribution.save(file.name, file, save=True)
-            release.save()
