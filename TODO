@@ -1,4 +1,4 @@
-* Write a tutorial on how to set up the server, registering projects, and 
+* Write a tutorial on how to set up the server, registering projects, and
   how to upload releases.
 * Make it possible to register users via distutils.
   (There should be a setting to turn this feature on/off).
@@ -7,7 +7,6 @@
 * Maybe add a permission "can upload new release", so more than one
   user can change the same project.
 * Should a project have co-owners?
-    - One possible solution: 
+    - One possible solution:
             http://github.com/initcrash/django-object-permissions/tree
-* Script to populate classifiers from 
-        http://pypi.python.org/pypi?%3Aaction=list_classifiers 
+            
