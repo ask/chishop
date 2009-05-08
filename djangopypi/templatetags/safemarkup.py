@@ -20,7 +20,7 @@ def saferst(value):
                               writer_name="html4css1",
                               settings_overrides=docutils_settings)
     except:
-        return foce_unicode(value)
+        return force_unicode(value)
     else:
         return mark_safe(force_unicode(parts["fragment"]))
 saferst.is_safe = True
