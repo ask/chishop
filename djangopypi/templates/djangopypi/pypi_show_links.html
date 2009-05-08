@@ -4,8 +4,8 @@
 <p style="font-style: italic;">
 {{ project.summary }}
 </p>
-{% load markup %}
-{{ project.description|restructuredtext }}
+{% load safemarkup %}
+{{ project.description|saferst }}
 
 <br/>
 <table><thead><th>Filename</th><th>Platform</th><th>Type</th><th>Version</th><th>Uploaded On</th><th>Size</th></thead>
