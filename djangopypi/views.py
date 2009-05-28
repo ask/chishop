@@ -158,24 +158,35 @@ def submit_project_or_release(user, post_data, files):
     return HttpResponse()
 
 
+def register_or_upload(request, post_data, files):
+    user = login_basic_auth(request)
+    if not user:
+        return HttpResponseUnauthorized('PyPI')
+
+    login(request, user)
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden(
+                "Not logged in, or invalid username/password.")
+
+    return submit_project_or_release(user, post_data, files)
+
+ACTIONS = {
+    # file_upload is the action used with distutils ``sdist`` command.
+    "file_upload": register_or_upload,
+
+    # submit is the :action used with distutils ``register`` command.
+    "submit": register_or_upload,
+}
+
+
 def simple(request, template_name="djangopypi/simple.html"):
     if request.method == "POST":
         post_data, files = parse_weird_post_data(request.raw_post_data)
-        action = post_data.get(":action")
-        if action == 'file_upload':
-            user = login_basic_auth(request)
-            if not user:
-                return HttpResponseUnauthorized('PyPI')
-
-            login(request, user)
-            if not request.user.is_authenticated():
-                return HttpResponseForbidden(
-                        "Not logged in, or invalid username/password.")
-
-            return submit_project_or_release(user, post_data, files)
-
-        return HttpResponseNotImplemented(
-                "The :action %s is not implemented" % action)
+        action_name = post_data.get(":action")
+        if action_name not in ACTIONS:
+            return HttpResponseNotImplemented(
+                "The action %s is not implemented" % action_name)
+        return ACTION[action](request, post_data, files)
 
     dists = Project.objects.all().order_by("name")
     context = RequestContext(request, {
