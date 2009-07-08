@@ -12,7 +12,7 @@ def saferst(value):
     except ImportError:
         return force_unicode(value)
 
-    docutils_setttings = getattr(settings, "RESTRUCTUREDTEXT_FILTER_SETTINGS",
+    docutils_settings = getattr(settings, "RESTRUCTUREDTEXT_FILTER_SETTINGS",
                                  dict())
     
     try:
