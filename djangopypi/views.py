@@ -161,7 +161,7 @@ def submit_project_or_release(user, post_data, files):
 def register_or_upload(request, post_data, files):
     user = login_basic_auth(request)
     if not user:
-        return HttpResponseUnauthorized('PyPI')
+        return HttpResponseUnauthorized('pypi')
 
     login(request, user)
     if not request.user.is_authenticated():
