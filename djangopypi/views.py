@@ -186,7 +186,7 @@ def simple(request, template_name="djangopypi/simple.html"):
         if action_name not in ACTIONS:
             return HttpResponseNotImplemented(
                 "The action %s is not implemented" % action_name)
-        return ACTION[action](request, post_data, files)
+        return ACTIONS[action_name](request, post_data, files)
 
     dists = Project.objects.all().order_by("name")
     context = RequestContext(request, {
