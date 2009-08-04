@@ -134,10 +134,9 @@ added"""
         print "%s-%s added" % (meta.name, meta.version)
 
     def _get_meta(self, path):
-        if path.endswith((".zip", ".tar.gz")):
-            return pkginfo.SDist(path)
-        elif path.endswith(".egg"):
-            return pkginfo.BDist(path)
+        data = pkginfo.get_metadata(path)
+        if data:
+            return data
         else:
             print "Couldn't get metadata from %s. Not added to chishop" % os.path.basename(path)
             return None
