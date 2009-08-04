@@ -110,7 +110,7 @@ class Project(models.Model):
     def get_release(self, version):
         """Return the release object for version, or None"""
         try:
-            self.releases.get(version=version)
+            return self.releases.get(version=version)
         except Release.DoesNotExist:
             return None
 
@@ -128,6 +128,7 @@ class Release(models.Model):
     class Meta:
         verbose_name = _(u"release")
         verbose_name_plural = _(u"releases")
+        unique_together = ("project", "version")
 
     def __unicode__(self):
         return u"%s (%s)" % (self.release_name, self.platform)
