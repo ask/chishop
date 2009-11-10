@@ -30,7 +30,13 @@ POSSIBILITY OF SUCH DAMAGE.
 
 """
 
+import cgi
 import os
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
@@ -45,53 +51,17 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import authenticate, login
 from djangopypi.http import HttpResponseNotImplemented
 from djangopypi.http import HttpResponseUnauthorized
+from djangopypi.utils import decode_fs
 
 
 ALREADY_EXISTS_FMT = _("""A file named "%s" already exists for %s. To fix """
                      + "problems with that you should create a new release.")
 
 
-def parse_weird_post_data(raw_post_data):
-    """ For some reason Django can't parse the HTTP POST data
-    sent by ``distutils`` register/upload commands.
-
-    This parser should be able to so, and returns a
-    :class:`django.utils.datastructures.MultiValueDict`
-    as you would expect from a regular ``request.POST`` object.
-    """
-    # If anyone knows any better way to do this, you're welcome
-    # to give me a solid beating. [askh@opera.com]
-    sep = raw_post_data.splitlines()[1]
-    items = raw_post_data.split(sep)
-    post_data = {}
-    files = {}
-    for part in [e for e in items if not e.isspace()]:
-        item = part.splitlines()
-        if len(item) < 2: continue
-        header = item[1].replace("Content-Disposition: form-data; ", "")
-        kvpairs = header.split(";")
-        headers = {}
-        for kvpair in kvpairs:
-            if not kvpair: continue
-            key, value = kvpair.split("=")
-            headers[key] = value.strip('"')
-        if not "name" in headers: continue
-        content = part[len("\n".join(item[0:2]))+2:len(part)-1]
-        if "filename" in headers:
-            file = SimpleUploadedFile(headers["filename"], content,
-                    content_type="application/gzip")
-            files["distribution"] = [file]
-        elif headers["name"] in post_data:
-            post_data[headers["name"]].append(content)
-        else:
-            # Distutils sends UNKNOWN for empty fields (e.g platform)
-            # [russell.sim@gmail.com]
-            if content == 'UNKNOWN':
-                post_data[headers["name"]] = [None]
-            else:
-                post_data[headers["name"]] = [content]
-
-    return MultiValueDict(post_data), MultiValueDict(files)
+def parse_distutils_request(request):
+    fp = StringIO(request.raw_post_data)
+    fs = cgi.FieldStorage(fp=fp, environ=request.META)
+    return decode_fs(fs)
 
 
 def login_basic_auth(request):
@@ -181,7 +151,7 @@ ACTIONS = {
 
 def simple(request, template_name="djangopypi/simple.html"):
     if request.method == "POST":
-        post_data, files = parse_weird_post_data(request.raw_post_data)
+        post_data, files = parse_distutils_request(request.raw_post_data)
         action_name = post_data.get(":action")
         if action_name not in ACTIONS:
             return HttpResponseNotImplemented(
