@@ -24,10 +24,10 @@
         <div id="user-tools">
           {% if user.is_authenticated %}
           Welcome, <strong>{{user.username}}</strong>.
-          <a href="{% url django.contrib.auth.views.logout%}?next={{request.path}}">Log out</a>
+          <a href="{% url django.contrib.auth.views.logout %}?next={{request.path}}">Log out</a>
           {% else %}
-          <a href="{% url django.contrib.auth.views.login %}?next={{request.path}}">Login</a> /
-          <a href="{% url registration_register%}">Register</a>
+          <a href="{% url django.contrib.auth.views.login %}?next={{request.path}}">Log in</a> /
+          <a href="{% url registration_register %}">Register</a>
           {% endif %}
         </div>
     </div>
