@@ -12,7 +12,6 @@ ADMINS = (
 # if you're sloppy.
 DJANGOPYPI_ALLOW_VERSION_OVERWRITE = False
 DJANGOPYPI_RELEASE_UPLOAD_TO = 'dists'
-LOCAL_DEVELOPMENT=True
 
 # change to False if you do not want Django's default server to serve static pages
 LOCAL_DEVELOPMENT = True
