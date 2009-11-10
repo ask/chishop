@@ -13,6 +13,9 @@ ADMINS = (
 DJANGOPYPI_ALLOW_VERSION_OVERWRITE = False
 DJANGOPYPI_RELEASE_UPLOAD_TO = 'dists'
 
+# change to False if you do not want Django's default server to serve static pages
+LOCAL_DEVELOPMENT = True
+
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = ''
@@ -88,5 +91,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.markup',
+    'django.contrib.admindocs',
     'djangopypi',
 )
