@@ -18,6 +18,9 @@ urlpatterns += patterns("",
     url(r'^admin/doc/', include("django.contrib.admindocs.urls")),
     url(r'^admin/(.*)', admin.site.root),
 
+    # Registration
+    url(r'^accounts/', include('registration.backends.default.urls')),
+
+    # The Chishop
     url(r'', include("djangopypi.urls"))
 )
-
