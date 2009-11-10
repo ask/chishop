@@ -1,11 +1,11 @@
 from settings import *
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 LOCAL_DEVELOPMENT = True
 
 if LOCAL_DEVELOPMENT:
-    import os
     import sys
     sys.path.append(os.path.dirname(__file__))
 
