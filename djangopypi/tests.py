@@ -1,6 +1,6 @@
 import unittest
 import StringIO
-from djangopypi.views import parse_weird_post_data
+from djangopypi.views import parse_distutils_request
 
 def create_post_data(action):
     data = {
@@ -67,12 +67,20 @@ def create_request(data):
     return body.getvalue()
 
 
+class MockRequest(object):
+
+    def __init__(self, raw_post_data):
+        self.raw_post_data = raw_post_data
+        self.META = {}
+
+
 class TestParseWeirdPostData(unittest.TestCase):
 
     def test_weird_post_data(self):
         data = create_post_data("submit")
         raw_post_data = create_request(data)
-        post, files = parse_weird_post_data(raw_post_data)
+        post, files = parse_distutils_request(MockRequest(raw_post_data))
+        print("post: %s files: %s" % (post, files))
         self.assertTrue(post)
 
         for key in post.keys():

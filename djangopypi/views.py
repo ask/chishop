@@ -15,12 +15,14 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import authenticate, login
+
 from registration.backends import get_backend
 from registration.forms import RegistrationForm
 
 from djangopypi.models import Project, Classifier, Release, UPLOAD_TO
 from djangopypi.forms import ProjectForm, ReleaseForm
-from djangopypi.http import HttpResponseNotImplemented, HttpResponseUnauthorized
+from djangopypi.http import HttpResponseUnauthorized
+from djangopypi.http import HttpResponseNotImplemented
 from djangopypi.utils import decode_fs
 
 
@@ -142,7 +144,7 @@ ACTIONS = {
 
 def simple(request, template_name="djangopypi/simple.html"):
     if request.method == "POST":
-        post_data, files = parse_distutils_request(request.raw_post_data)
+        post_data, files = parse_distutils_request(request)
         action_name = post_data.get(":action")
         if action_name not in ACTIONS:
             return HttpResponseNotImplemented(
