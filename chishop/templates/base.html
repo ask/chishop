@@ -20,6 +20,16 @@
         {% block site_logo %}{% endblock %}
         <h1 id="site-name">{% block site_name_header %}{% endblock %}</h1>
         </div>
+
+        <div id="user-tools">
+          {% if user.is_authenticated %}
+          Welcome, <strong>{{user.username}}</strong>.
+          <a href="{% url django.contrib.auth.views.logout %}?next={{request.path}}">Log out</a>
+          {% else %}
+          <a href="{% url django.contrib.auth.views.login %}?next={{request.path}}">Log in</a> /
+          <a href="{% url registration_register %}">Register</a>
+          {% endif %}
+        </div>
     </div>
     <!-- END Header -->
 
@@ -60,4 +70,3 @@
 
 </body>
 </html>
-

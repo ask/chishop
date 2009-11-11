@@ -16,6 +16,14 @@ DJANGOPYPI_RELEASE_UPLOAD_TO = 'dists'
 # change to False if you do not want Django's default server to serve static pages
 LOCAL_DEVELOPMENT = True
 
+REGISTRATION_OPEN = True
+ACCOUNT_ACTIVATION_DAYS = 7
+LOGIN_REDIRECT_URL = "/"
+
+EMAIL_HOST = ''
+DEFAULT_FROM_EMAIL = ''
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = ''
@@ -77,6 +85,14 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'urls'
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.core.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.request",
+)
+
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
@@ -92,5 +108,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.markup',
     'django.contrib.admindocs',
+    'registration',
     'djangopypi',
 )

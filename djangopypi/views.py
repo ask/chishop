@@ -10,15 +10,17 @@ from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.http import QueryDict, HttpResponseForbidden
 from django.shortcuts import render_to_response
-from djangopypi.models import Project, Classifier, Release, UPLOAD_TO
-from djangopypi.forms import ProjectForm, ReleaseForm
 from django.template import RequestContext
 from django.utils.datastructures import MultiValueDict
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import authenticate, login
-from djangopypi.http import HttpResponseNotImplemented
-from djangopypi.http import HttpResponseUnauthorized
+from registration.backends import get_backend
+from registration.forms import RegistrationForm
+
+from djangopypi.models import Project, Classifier, Release, UPLOAD_TO
+from djangopypi.forms import ProjectForm, ReleaseForm
+from djangopypi.http import HttpResponseNotImplemented, HttpResponseUnauthorized
 from djangopypi.utils import decode_fs
 
 
@@ -108,12 +110,33 @@ def register_or_upload(request, post_data, files):
 
     return submit_project_or_release(user, post_data, files)
 
+def create_user(request, post_data, files):
+    """Create new user from a distutil client request"""
+    form = RegistrationForm({"username": post_data["name"],
+                             "email": post_data["email"],
+                             "password1": post_data["password"],
+                             "password2": post_data["password"]})
+    if not form.is_valid():
+        # Dist Utils requires error msg in HTTP status: "HTTP/1.1 400 msg"
+        # Which is HTTP/WSGI incompatible, so we're just returning a empty 400.
+        return HttpResponseBadRequest()
+
+    backend = get_backend("registration.backends.default.DefaultBackend")
+    if not backend.registration_allowed(request):
+        return HttpResponseBadRequest()
+    new_user = backend.register(request, **form.cleaned_data)
+    return HttpResponse("OK\n", status=200, mimetype='text/plain')
+
+
 ACTIONS = {
     # file_upload is the action used with distutils ``sdist`` command.
     "file_upload": register_or_upload,
 
     # submit is the :action used with distutils ``register`` command.
     "submit": register_or_upload,
+
+    # user is the action used when registering a new user
+    "user": create_user,
 }
 
 

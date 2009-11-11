@@ -6,27 +6,23 @@ ChiShop/DjangoPyPI
 Installation
 ============
 
-First you have to install the dependencies::
+Install dependencies::
 
-    $ python setup.py build
-    # python setup.py install # (run as root)
+    $ python bootstrap.py --distribute
+    $ ./bin/buildout
 
 Initial configuration
 ---------------------
 ::
 
-    $ cd chipshop/
-
-    $ $EDITOR settings.py
-
-    $ python manage.py syncdb
+    $ $EDITOR chishop/settings.py
+    $ ./bin/django syncdb
 
 Run the PyPI server
 -------------------
 ::
 
-    $ python manage.py runserver
-
+    $ ./bin/django runserver
 
 Please note that ``chishop/media/dists`` has to be writable by the
 user the web-server is running as.
