@@ -31,9 +31,42 @@ ALREADY_EXISTS_FMT = _("""A file named "%s" already exists for %s. To fix """
 
 
 def parse_distutils_request(request):
-    fp = StringIO(request.raw_post_data)
-    fs = cgi.FieldStorage(fp=fp, environ=request.META)
-    return decode_fs(fs)
+    raw_post_data = request.raw_post_data
+    sep = raw_post_data.splitlines()[1]
+    items = raw_post_data.split(sep)
+    post_data = {}
+    files = {}
+    for part in filter(lambda e: not e.isspace(), items):
+        item = part.splitlines()
+        if len(item) < 2:
+            continue
+        header = item[1].replace("Content-Disposition: form-data; ", "")
+        kvpairs = header.split(";")
+        headers = {}
+        for kvpair in kvpairs:
+            if not kvpair:
+                continue
+            key, value = kvpair.split("=")
+            headers[key] = value.strip('"')
+        if "name" not in headers:
+            continue
+        content = part[len("\n".join(item[0:2]))+2:len(part)-1]
+        if "filename" in headers:
+            file = SimpleUploadedFile(headers["filename"], content,
+                    content_type="application/gzip")
+            files["distribution"] = [file]
+        elif headers["name"] in post_data:
+            post_data[headers["name"]].append(content)
+        else:
+            # Distutils sends UNKNOWN for empty fields (e.g platform)
+            # [russell.sim@gmail.com]
+            if content == 'UNKNOWN':
+                post_data[headers["name"]] = [None]
+            else:
+                post_data[headers["name"]] = [content]
+ 
+    return MultiValueDict(post_data), MultiValueDict(files)
+
 
 
 def login_basic_auth(request):
