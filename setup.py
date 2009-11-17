@@ -71,7 +71,6 @@ setup(
     install_requires=[
         'django>=1.0',
         'docutils',
-        'pkgutil',
         'django-registration>0.7',
     ],
     classifiers=[
