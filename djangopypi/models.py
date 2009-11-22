@@ -96,7 +96,7 @@ class Release(models.Model):
     class Meta:
         verbose_name = _(u"release")
         verbose_name_plural = _(u"releases")
-        unique_together = ("project", "version")
+        unique_together = ("project", "version", "platform", "distribution", "pyversion")
 
     def __unicode__(self):
         return u"%s (%s)" % (self.release_name, self.platform)
