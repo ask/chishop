@@ -27,6 +27,13 @@ Run the PyPI server
 Please note that ``chishop/media/dists`` has to be writable by the
 user the web-server is running as.
 
+In production
+-------------
+
+You may want to copy the file ``chishop/production_example.py`` and modify
+for use as your production settings; you will also need to modify
+``bin/django.wsgi`` to refer to your production settings.
+
 Using Setuptools
 ================
 
