@@ -10,7 +10,7 @@ urlpatterns = patterns('')
 # Serve static pages.
 if settings.LOCAL_DEVELOPMENT:
     urlpatterns += patterns("django.views",
-        url(r"%s(?P<path>.*)$" % settings.MEDIA_URL[1:], "static.serve", {
+        url(r"^%s(?P<path>.*)$" % settings.MEDIA_URL[1:], "static.serve", {
             "document_root": settings.MEDIA_ROOT}))
 
 urlpatterns += patterns("",
