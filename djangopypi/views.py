@@ -216,7 +216,7 @@ def show_version(request, dist_name, version,
     try:
         release = Project.objects.get(name=dist_name).releases \
                                         .get(version=version)
-    except Project.DoesNotExist:
+    except (Project.DoesNotExist, Release.DoesNotExist):
         raise Http404()
 
     context = RequestContext(request, {
