@@ -15,12 +15,13 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import authenticate, login
+from django.db.models import Q
 
 from registration.backends import get_backend
 from registration.forms import RegistrationForm
 
 from djangopypi.models import Project, Classifier, Release, UPLOAD_TO
-from djangopypi.forms import ProjectForm, ReleaseForm
+from djangopypi.forms import ProjectForm, ReleaseForm, SearchForm
 from djangopypi.http import HttpResponseUnauthorized
 from djangopypi.http import HttpResponseNotImplemented
 from djangopypi.utils import decode_fs
@@ -227,3 +228,17 @@ def show_version(request, dist_name, version,
     })
 
     return render_to_response(template_name, context_instance=context)
+    
+def search(request):
+    if request.method == 'POST':
+        search_value = request.POST.get('search_value')
+        matches = Project.objects.get(Q(name__contains=search_value) | Q(description__contains=search_value))
+        
+        return HttpResponse(matches)
+    else:
+        search_form = SearchForm()
+        return render_to_response(
+            "djangopypi/search.html",
+            {'search_form':search_form},
+            context_instance=RequestContext(request)
+        )
