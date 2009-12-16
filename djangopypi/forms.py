@@ -15,7 +15,3 @@ class ReleaseForm(forms.ModelForm):
     class Meta:
         model = Release
         exclude = ['project']
-        
-class SearchForm(forms.Form):
-    search_value = forms.CharField(max_length=200)
-
