@@ -3,8 +3,8 @@
 {% block bread_crumbs_1 %}&rsaquo;Search{% endblock %}
 
 {% block content %}
-    {% ifnotequal search_value ''%}
-        <h1>Index of Packages Matching '{{ search_value }}'</h1>
+    {% ifnotequal search_term ''%}
+        <h1>Index of Packages Matching '{{ search_term }}'</h1>
     {% else %}
         <h1>You need to supply a search term.</h1>
     {% endifnotequal %}
