@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-au" xml:lang="en-au">
 <head>
 <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% load adminmedia %}{% admin_media_prefix %}css/base.css{% endblock %}"/>
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}style/djangopypi.css"/>
 {% block extrastyle %}{% endblock %}
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 <title>{% block title %}{% endblock %}</title>
@@ -19,6 +20,10 @@
         <div id="branding">
         {% block site_logo %}{% endblock %}
         <h1 id="site-name">{% block site_name_header %}{% endblock %}</h1>
+        </div>
+        
+        <div class="search">
+            {% include "djangopypi/search.html" %}
         </div>
 
         <div id="user-tools">

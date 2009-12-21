@@ -15,6 +15,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import authenticate, login
+from django.db.models import Q
 
 from registration.backends import get_backend
 from registration.forms import RegistrationForm
@@ -227,3 +228,29 @@ def show_version(request, dist_name, version,
     })
 
     return render_to_response(template_name, context_instance=context)
+    
+def search(request):
+    search_term = ''
+    if request.method == 'POST':
+        search_term = request.POST.get('search_term')
+        if search_term != '':
+            dists = Project.objects.filter(Q(name__contains=search_term) | Q(summary__contains=search_term))
+            return render_to_response(
+                'djangopypi/search_results.html',
+                {'dists':dists,'search_term':search_term},
+                context_instance = RequestContext(request)
+                )
+        else:
+            dists = Project.objects.all()
+            return render_to_response(
+                'djangopypi/search_results.html',
+                {'search_term':search_term},
+                context_instance = RequestContext(request)
+                )
+    else:
+        dists = Project.objects.all()
+        return render_to_response(
+            'djangopypi/search_results.html',
+            {'search_term':search_term},
+            context_instance = RequestContext(request)
+            )

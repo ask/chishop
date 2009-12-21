@@ -5,6 +5,7 @@
 *.sqlite-journal
 settings_local.py
 .*.sw[po]
+*.kpf
 dist/
 *.egg-info
 doc/__build/*
