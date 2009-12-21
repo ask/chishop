@@ -80,11 +80,12 @@ class TestParseWeirdPostData(unittest.TestCase):
         data = create_post_data("submit")
         raw_post_data = create_request(data)
         post, files = parse_distutils_request(MockRequest(raw_post_data))
-        print("post: %s files: %s" % (post, files))
         self.assertTrue(post)
 
         for key in post.keys():
             if isinstance(data[key], list):
                 self.assertEquals(data[key], post.getlist(key))
+            elif data[key] == "UNKNOWN":
+                self.assertTrue(post[key] is None)
             else:
                 self.assertEquals(post[key], data[key])
