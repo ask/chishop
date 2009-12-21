@@ -25,6 +25,7 @@ from djangopypi.forms import ProjectForm, ReleaseForm
 from djangopypi.http import HttpResponseUnauthorized
 from djangopypi.http import HttpResponseNotImplemented
 from djangopypi.utils import decode_fs
+from djangopypi.views.search import search
 
 
 ALREADY_EXISTS_FMT = _("""A file named "%s" already exists for %s. To fix """
