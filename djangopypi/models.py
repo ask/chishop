@@ -1,8 +1,12 @@
 import os
-from django.conf import settings
+
 from django.db import models
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
+
+from djangopypi import conf
+from djangopypi.managers import ProjectManager, ReleaseManager
 
 OS_NAMES = (
         ("aix", "AIX"),
@@ -32,9 +36,6 @@ ARCHITECTURES = (
     ("ultrasparc", "UltraSparc"),
 )
 
-UPLOAD_TO = getattr(settings,
-    "DJANGOPYPI_RELEASE_UPLOAD_TO", 'dist')
-
 class Classifier(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
@@ -47,7 +48,7 @@ class Classifier(models.Model):
 
 
 class Project(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255, unique=False)
     license = models.TextField(blank=True)
     metadata_version = models.CharField(max_length=64, default=1.0)
     author = models.CharField(max_length=128, blank=True)
@@ -59,6 +60,9 @@ class Project(models.Model):
     classifiers = models.ManyToManyField(Classifier)
     owner = models.ForeignKey(User, related_name="projects")
     updated = models.DateTimeField(auto_now=True)
+    role = models.CharField(max_length=128, default=conf.DEFAULT_ROLE)
+
+    objects = ProjectManager()
 
     class Meta:
         verbose_name = _(u"project")
@@ -84,7 +88,7 @@ class Project(models.Model):
 
 class Release(models.Model):
     version = models.CharField(max_length=128)
-    distribution = models.FileField(upload_to=UPLOAD_TO)
+    distribution = models.FileField(upload_to=conf.RELEASE_UPLOAD_TO)
     md5_digest = models.CharField(max_length=255, blank=True)
     platform = models.CharField(max_length=255, blank=True)
     signature = models.CharField(max_length=128, blank=True)
@@ -92,6 +96,8 @@ class Release(models.Model):
     pyversion = models.CharField(max_length=255, blank=True)
     project = models.ForeignKey(Project, related_name="releases")
     upload_time = models.DateTimeField(auto_now=True)
+
+    objects = ReleaseManager()
 
     class Meta:
         verbose_name = _(u"release")
