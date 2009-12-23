@@ -1,0 +1,31 @@
+{% extends "base_site.html" %}
+
+{% block bread_crumbs_1 %}&rsaquo;Search{% endblock %}
+
+{% block content %}
+    {% ifnotequal search_term ''%}
+        <h1>Index of Packages Matching '{{ search_term }}'</h1>
+    {% else %}
+        <h1>You need to supply a search term.</h1>
+    {% endifnotequal %}
+    {% if dists %}
+        <table>
+            <thead>
+                <th>Updated</th>
+                <th>Package</th>
+                <th>Summary</th>
+            </thead>
+            <tbody>
+            {% for dist in dists %}
+                <tr>
+                    <td>{{ dist.updated|date:"d/m/y" }}
+                    <td><a href="{{ dist.get_pypi_absolute_url }}"/>{{ dist.name }}</a></td>
+                    <td>{{ dist.summary|truncatewords:10 }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        There were no matches.
+    {% endif %}
+{% endblock content %}

@@ -1,6 +1,10 @@
 import unittest
 import StringIO
 from djangopypi.views import parse_distutils_request
+from djangopypi.models import Project, Classifier
+from django.test.client import Client
+from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 
 def create_post_data(action):
     data = {
@@ -80,11 +84,27 @@ class TestParseWeirdPostData(unittest.TestCase):
         data = create_post_data("submit")
         raw_post_data = create_request(data)
         post, files = parse_distutils_request(MockRequest(raw_post_data))
-        print("post: %s files: %s" % (post, files))
         self.assertTrue(post)
 
         for key in post.keys():
             if isinstance(data[key], list):
                 self.assertEquals(data[key], post.getlist(key))
+            elif data[key] == "UNKNOWN":
+                self.assertTrue(post[key] is None)
             else:
                 self.assertEquals(post[key], data[key])
+
+class TestSearch(unittest.TestCase):
+    
+    def setUp(self):
+        data = create_post_data("submit")
+        dummy_user = User.objects.create(username='krill', password='12345',
+                                         email='krill@opera.com')
+        Project.objects.create(name=data['name'], license=data['license'],
+                               summary=data["summary"], owner=dummy_user)
+        
+        
+    def testSearchForPackage(self):
+        client = Client()
+        response = client.post(reverse('djangopypi-search'), {'search_term': 'foo'})
+        self.assertTrue("The quick brown fox jumps over the lazy dog." in response.content)

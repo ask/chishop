@@ -15,4 +15,3 @@ class ReleaseForm(forms.ModelForm):
     class Meta:
         model = Release
         exclude = ['project']
-
