@@ -1,10 +1,11 @@
 import unittest
 import StringIO
-from djangopypi.views import parse_distutils_request
+from djangopypi.views import parse_distutils_request, simple
 from djangopypi.models import Project, Classifier
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.http import HttpRequest
 
 def create_post_data(action):
     data = {
@@ -94,17 +95,45 @@ class TestParseWeirdPostData(unittest.TestCase):
             else:
                 self.assertEquals(post[key], data[key])
 
+
+
+client = Client()
+
 class TestSearch(unittest.TestCase):
     
     def setUp(self):
-        data = create_post_data("submit")
         dummy_user = User.objects.create(username='krill', password='12345',
-                                         email='krill@opera.com')
-        Project.objects.create(name=data['name'], license=data['license'],
-                               summary=data["summary"], owner=dummy_user)
+                                 email='krill@opera.com')
+        Project.objects.create(name='foo', license='Gnu',
+                               summary="The quick brown fox jumps over the lazy dog.",
+                               owner=dummy_user)        
         
-        
-    def testSearchForPackage(self):
-        client = Client()
+    def test_search_for_package(self):        
         response = client.post(reverse('djangopypi-search'), {'search_term': 'foo'})
         self.assertTrue("The quick brown fox jumps over the lazy dog." in response.content)
+        
+class TestSimpleView(unittest.TestCase):
+    
+    def create_distutils_httprequest(self, user_data={}):
+        self.post_data = create_post_data(action='user')        
+        self.post_data.update(user_data)
+        self.raw_post_data = create_request(self.post_data)
+        request = HttpRequest()
+        request.POST = self.post_data
+        request.method = "POST"
+        request.raw_post_data = self.raw_post_data
+        return request      
+        
+    def test_user_registration(self):        
+        request = self.create_distutils_httprequest({'name': 'peter_parker', 'email':'parker@dailybugle.com',
+                                                    'password':'spiderman'})
+        response = simple(request)
+        self.assertEquals(200, response.status_code)
+        
+    def test_user_registration_with_wrong_data(self):
+        request = self.create_distutils_httprequest({'name': 'peter_parker', 'email':'parker@dailybugle.com',
+                                                     'password':'',})
+        response = simple(request)
+        self.assertEquals(400, response.status_code)
+        
+        
