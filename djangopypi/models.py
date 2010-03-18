@@ -52,7 +52,7 @@ class Project(models.Model):
     metadata_version = models.CharField(max_length=64, default=1.0)
     author = models.CharField(max_length=128, blank=True)
     home_page = models.URLField(verify_exists=False, blank=True, null=True)
-    download_url = models.URLField(verify_exists=False, blank=True, null=True)
+    download_url = models.CharField(max_length=200, blank=True, null=True)
     summary = models.TextField(blank=True)
     description = models.TextField(blank=True)
     author_email = models.CharField(max_length=255, blank=True)
