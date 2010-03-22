@@ -60,7 +60,7 @@ Uploading a package: Python >=2.6
 
 To push the package to the local pypi::
 
-    $ python setup.py register sdist upload -r local
+    $ python setup.py register -r local sdist upload -r local
 
 
 Uploading a package: Python <2.6
@@ -74,6 +74,6 @@ instead of using register and dist command, you can use "mregister" and "mupload
 
 To push the package to the local pypi::
 
-    $ python setup.py mregister sdist mupload -r local
+    $ python setup.py mregister -r local sdist mupload -r local
 
 .. # vim: syntax=rst expandtab tabstop=4 shiftwidth=4 shiftround
