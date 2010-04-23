@@ -83,13 +83,13 @@ class Project(models.Model):
             return None
 
 class Release(models.Model):
-    version = models.CharField(max_length=128)
+    version = models.CharField(max_length=32)
     distribution = models.FileField(upload_to=UPLOAD_TO)
     md5_digest = models.CharField(max_length=255, blank=True)
-    platform = models.CharField(max_length=255, blank=True)
+    platform = models.CharField(max_length=32, blank=True)
     signature = models.CharField(max_length=128, blank=True)
     filetype = models.CharField(max_length=255, blank=True)
-    pyversion = models.CharField(max_length=255, blank=True)
+    pyversion = models.CharField(max_length=32, blank=True)
     project = models.ForeignKey(Project, related_name="releases")
     upload_time = models.DateTimeField(auto_now=True)
 
