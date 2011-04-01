@@ -39,7 +39,7 @@
     <!-- END Header -->
 
     <div class="breadcrumbs">
-     {% block breadcrumbs %}<a href="/{{ base_url }}">Home</a>{% endblock %}
+     {% block breadcrumbs %}<a href="{% url djangopypi-pypi %}">Home</a>{% endblock %}
      {% block bread_crumbs_1 %}{% endblock %}</div>
         {% block messagelist %}
         {% if messages %}
